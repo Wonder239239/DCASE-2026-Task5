@@ -23,7 +23,7 @@ Typical results on the DCASE 2026 Task 5 Dev Set with 1607 samples:
 ## Project Layout
 
 ```text
-atae/
+DCASE-2026-Task5/
 ├── atae/                     # Python package
 │   ├── bias_core.py          # ATAE injection core: ATAEInjector
 │   ├── inference.py          # Inference
@@ -42,8 +42,8 @@ atae/
 **1. Clone this repository**
 
 ```bash
-git clone https://github.com/Wonder239239/DCASE-2026-Task5.git atae
-cd atae
+git clone https://github.com/Wonder239239/DCASE-2026-Task5.git
+cd DCASE-2026-Task5
 ```
 
 **2. Install Python dependencies**
