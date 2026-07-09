@@ -6,7 +6,7 @@
 #   export MOSS_AUDIO_DIR=/path/to/MOSS-Audio
 #   export DATA_DIR=/path/to/DCASE2026-Task5-DevSet
 #   bash scripts/run_pipeline.sh
-#   TARGET_LAYER=24 BIAS_VALUE=1.0 bash scripts/run_pipeline.sh
+#   TARGET_LAYER=0 BIAS_VALUE=2.0 bash scripts/run_pipeline.sh
 #   TARGET_LAYER=0 BIAS_VALUE=0 bash scripts/run_pipeline.sh   # baseline
 #   MAX_SAMPLES=20 bash scripts/run_pipeline.sh
 #   SKIP_INFERENCE=1 OUTPUT_JSONL=results/...jsonl bash scripts/run_pipeline.sh
