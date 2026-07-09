@@ -6,8 +6,6 @@ This is the submission repository for the [DCASE 2026 Task 5 Audio-Dependent Que
 
 🏆 Teams ranking: 4. Lightweight system ranking: 3.
 
-This repository was organized from internal `bias/workshop` experiment code and does not modify any files in the original workshop directory.
-
 ## Method
 
 - Register a forward hook on the self-attention module of a target decoder layer `L`.
