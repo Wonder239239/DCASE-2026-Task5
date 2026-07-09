@@ -19,7 +19,7 @@ Typical results on the DCASE 2026 Task 5 Dev Set with 1607 samples:
 
 | Setting | Accuracy |
 |---------|----------|
-| Baseline, no bias, L0 b0.0 | 64.84% |
+| Baseline | 64.84% |
 | ATAE best, L0 b2.0 | 65.84% |
 
 ## Project Layout
