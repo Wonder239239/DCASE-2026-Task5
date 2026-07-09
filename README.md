@@ -1,82 +1,78 @@
 # ATAE: Audio Token Attention Enhancement
 
-[English](#english) | [中文](#中文)
+**ATAE (Audio Token Attention Enhancement)** injects a tunable additive bias on audio key positions in the decoder self-attention of audio-language models, encouraging the model to attend more to audio tokens. This repository provides a full experimental pipeline built on [MOSS-Audio-8B-Thinking](https://huggingface.co/OpenMOSS/MOSS-Audio-8B-Thinking): inference, answer parsing/rematching, and accuracy evaluation.
 
----
+This is the submission repository for the [DCASE 2026 Task 5 Audio-Dependent Question Answering](https://dcase.community/challenge2026/task-audio-dependent-question-answering) challenge. Our team ranked fourth.
 
-## 中文
+This repository was organized from internal `bias/workshop` experiment code and does not modify any files in the original workshop directory.
 
-**ATAE（Audio Token Attention Enhancement）** 是一种在音频-语言模型的 **decoder self-attention** 中，对 **audio token 对应的 key 位置** 注入可调 logit bias 的方法，用于引导模型更关注音频内容。本仓库提供基于 [MOSS-Audio-8B-Thinking](https://huggingface.co/OpenMOSS/MOSS-Audio-8B-Thinking) 的完整实验流水线：推理 → 答案解析/重匹配 → 准确率评估。
+## Method
 
-本仓库是 [DCASE 2026 Task 5 Audio-Dependent Question Answering](https://dcase.community/challenge2026/task-audio-dependent-question-answering) 比赛的参赛仓库，我们最终排名第四。
+- Register a forward hook on the self-attention module of a target decoder layer `L`.
+- Add a constant bias `b` to attention logits at audio key positions.
+- Use eager attention instead of SDPA/Flash attention, so the hook can modify the 4D floating-point `attention_mask`.
+- Apply the method to audio multiple-choice QA: question, choices, and audio in; model answer out.
 
-> 本仓库由内部 `bias/workshop` 实验代码整理而来，**未修改**原始 workshop 目录中的任何文件。
+Typical results on the DCASE 2026 Task 5 Dev Set with 1607 samples:
 
-### 方法简介
+| Setting | Accuracy |
+|---------|----------|
+| Baseline, no bias, L0 b0.0 | 64.84% |
+| ATAE best, L0 b2.0 | 65.84% |
 
-- 在指定 decoder 层 `L` 的 self-attention 上注册 forward hook
-- 对 attention logits 中对应 **audio key** 的位置加上常数 bias `b`
-- 模型需使用 **eager attention**（非 SDPA/Flash），以便 hook 能修改 4D floating-point `attention_mask`
-- 适用于音频多选题（MCQ）：输入 question + choices + audio，输出模型回答
+## Project Layout
 
-在 DCASE 2026 Task 5 Dev Set（1607 条）上，MOSS-Audio-8B-Thinking 的典型结果：
-
-| 设置 | 准确率 |
-|------|--------|
-| Baseline（无 bias，L0 b0.0） | 64.84% |
-| ATAE 最佳（L0 b2.0） | 65.84% |
-
-### 目录结构
-
-```
+```text
 atae/
-├── atae/                     # Python 包
-│   ├── bias_core.py          # ATAE 注入核心（ATAEInjector）
-│   ├── inference.py          # 推理
+├── atae/                     # Python package
+│   ├── bias_core.py          # ATAE injection core: ATAEInjector
+│   ├── inference.py          # Inference
 │   ├── backfill_parsed_answer.py
 │   ├── postprocess_predictions.py
 │   └── evaluate.py
 ├── scripts/
-│   └── run_pipeline.sh       # 推理 → 后处理 → 评估
-├── data/                     # 数据目录（见 data/README.md）
-├── results/                  # 预测输出
-└── logs/                     # 日志
+│   └── run_pipeline.sh       # Inference, post-processing, and evaluation
+├── data/                     # Data directory; see data/README.md
+├── results/                  # Prediction outputs
+└── logs/                     # Logs
 ```
 
-### 环境准备
+## Setup
 
-**1. 克隆本仓库**
+**1. Clone this repository**
 
 ```bash
 git clone <your-repo-url> atae
 cd atae
 ```
 
-**2. Python 依赖**
+**2. Install Python dependencies**
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-**3. MOSS-Audio 模型代码**（不在 PyPI 上，需单独克隆）
+**3. Clone the MOSS-Audio model code**
+
+MOSS-Audio is not available on PyPI and needs to be cloned separately:
 
 ```bash
 git clone https://github.com/OpenMOSS/MOSS-Audio.git
 export MOSS_AUDIO_DIR=/path/to/MOSS-Audio
 ```
 
-**4. 模型权重**
+**4. Download model weights**
 
-从 Hugging Face 下载 [MOSS-Audio-8B-Thinking](https://huggingface.co/OpenMOSS/MOSS-Audio-8B-Thinking)：
+Download [MOSS-Audio-8B-Thinking](https://huggingface.co/OpenMOSS/MOSS-Audio-8B-Thinking) from Hugging Face:
 
 ```bash
 export MODEL_PATH=/path/to/MOSS-Audio-8B-Thinking
 ```
 
-**5. 评估数据**
+**5. Prepare evaluation data**
 
-见 [`data/README.md`](data/README.md)。默认期望：
+See [`data/README.md`](data/README.md). The default expected layout is:
 
 - `data/dev.jsonl`
 - `data/dev_audios/*.wav`
@@ -85,51 +81,45 @@ export MODEL_PATH=/path/to/MOSS-Audio-8B-Thinking
 export DATA_DIR="$(pwd)/data"
 ```
 
-### 快速开始
+## Quick Start
 
-**Smoke test（2 条样本，需 GPU）：**
-
-```bash
-export MODEL_PATH=/path/to/MOSS-Audio-8B-Thinking
-export MOSS_AUDIO_DIR=/path/to/MOSS-Audio
-export DATA_DIR=/path/to/your/data
-
-MAX_SAMPLES=2 TARGET_LAYER=0 BIAS_VALUE=2.0 bash scripts/run_pipeline.sh
-```
-
-**完整 dev set 单次实验：**
+**Full dev set run:**
 
 ```bash
-TARGET_LAYER=24 BIAS_VALUE=1.0 bash scripts/run_pipeline.sh
+TARGET_LAYER=0 BIAS_VALUE=2.0 bash scripts/run_pipeline.sh
 ```
 
-**Baseline（不注入 bias，设 `BIAS_VALUE=0`）：**
+**Baseline run:**
+
+Set `BIAS_VALUE=0` to disable bias injection.
 
 ```bash
 TARGET_LAYER=0 BIAS_VALUE=0 bash scripts/run_pipeline.sh
 ```
 
-**仅后处理 + 评估（已有预测文件）：**
+**Post-processing and evaluation only:**
+
+Use this when a prediction file already exists.
 
 ```bash
-SKIP_INFERENCE=1 OUTPUT_JSONL=results/dev_single_setting_L24_b1.0.jsonl bash scripts/run_pipeline.sh
+SKIP_INFERENCE=1 OUTPUT_JSONL=results/dev_single_setting_L0_b2.0.jsonl bash scripts/run_pipeline.sh
 ```
 
-### 主要环境变量
+## Main Environment Variables
 
-| 变量 | 说明 | 默认值 |
-|------|------|--------|
-| `MODEL_PATH` | MOSS-Audio 模型权重路径 | （必填） |
-| `MOSS_AUDIO_DIR` | MOSS-Audio 源码根目录 | （必填） |
-| `DATA_DIR` | 数据根目录 | `./data` |
-| `TARGET_LAYER` | ATAE 注入的 decoder 层索引 | `0` |
-| `BIAS_VALUE` | attention logit bias 数值；`0` 即为 baseline | `2.0` |
-| `MAX_SAMPLES` | 限制样本数，`0` 表示全量 | `0` |
-| `RESUME` | 从已有 jsonl 断点续跑 | `1` |
-| `DO_SAMPLE` | `1` 采样，`0` greedy | `0` |
-| `MAX_NEW_TOKENS` | 最大生成长度 | `1024` |
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `MODEL_PATH` | Path to MOSS-Audio model weights | Required |
+| `MOSS_AUDIO_DIR` | Root directory of the MOSS-Audio source code | Required |
+| `DATA_DIR` | Data root directory | `./data` |
+| `TARGET_LAYER` | Decoder layer index for ATAE injection | `0` |
+| `BIAS_VALUE` | Attention logit bias value; `0` means baseline | `2.0` |
+| `MAX_SAMPLES` | Limit the number of samples; `0` means all samples | `0` |
+| `RESUME` | Resume from an existing JSONL output | `1` |
+| `DO_SAMPLE` | `1` for sampling, `0` for greedy decoding | `0` |
+| `MAX_NEW_TOKENS` | Maximum generation length | `1024` |
 
-### 直接使用 Python CLI
+## Python CLI
 
 ```bash
 export MOSS_AUDIO_DIR=/path/to/MOSS-Audio
@@ -138,32 +128,11 @@ python -m atae.inference \
   --input-jsonl data/dev.jsonl \
   --audio-root data \
   --output-jsonl results/test.jsonl \
-  --target-layer 24 \
-  --bias-value 1.0 \
+  --target-layer 0 \
+  --bias-value 2.0 \
   --max-samples 10
 ```
 
----
-
-## English
-
-**ATAE (Audio Token Attention Enhancement)** injects a tunable **additive bias on audio key positions** in the **decoder self-attention** of audio-language models, encouraging the model to attend more to audio tokens. This repo provides a full pipeline built on [MOSS-Audio-8B-Thinking](https://huggingface.co/OpenMOSS/MOSS-Audio-8B-Thinking): inference → answer parsing/rematch → accuracy evaluation.
-
-### Quick start
-
-```bash
-pip install -r requirements.txt
-export MODEL_PATH=/path/to/MOSS-Audio-8B-Thinking
-export MOSS_AUDIO_DIR=/path/to/MOSS-Audio
-export DATA_DIR=/path/to/data
-
-MAX_SAMPLES=2 TARGET_LAYER=0 BIAS_VALUE=2.0 bash scripts/run_pipeline.sh
-```
-
-Baseline: set `BIAS_VALUE=0` (e.g. `TARGET_LAYER=0 BIAS_VALUE=0 bash scripts/run_pipeline.sh`).
-
-See [`data/README.md`](data/README.md) for dataset layout.
-
-### License
+## License
 
 [MIT License](LICENSE)
