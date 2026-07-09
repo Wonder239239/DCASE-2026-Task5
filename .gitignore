@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+.venv/
+venv/
+.env
+
+# Caches and local artifacts
+.cache/
+*.log
+logs/*
+!logs/.gitkeep
+
+# Predictions and experiment outputs
+results/*
+!results/.gitkeep
+
+# Data (download separately)
+data/dev.jsonl
+data/dev_audios/
+data/eval.jsonl
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+*.swp

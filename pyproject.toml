@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "atae"
+version = "0.1.0"
+description = "ATAE (Audio Token Attention Enhancement): tunable attention bias on audio tokens"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = [
+  "torch>=2.1.0",
+  "transformers>=4.45.0",
+  "tqdm>=4.66.0",
+]
+
+[project.scripts]
+atae-infer = "atae.inference:main"
+atae-eval = "atae.evaluate:main"
+
+[tool.setuptools.packages.find]
+include = ["atae*"]

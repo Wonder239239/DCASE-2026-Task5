@@ -1,0 +1,6 @@
+torch>=2.1.0
+transformers>=4.45.0
+tqdm>=4.66.0
+
+# MOSS-Audio model code is not on PyPI. Clone the official repo and set MOSS_AUDIO_DIR.
+# Example: git clone https://github.com/OpenMOSS/MOSS-Audio.git
