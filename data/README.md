@@ -28,5 +28,5 @@ export DATA_DIR="$(pwd)/data"
 Or override explicitly:
 
 ```bash
-INPUT_JSONL=/path/to/dev.jsonl AUDIO_ROOT=/path/to/dev_audios GOLD_JSONL=/path/to/dev.jsonl bash scripts/run_pipeline.sh
+INPUT_JSONL=/path/to/data/dev.jsonl AUDIO_ROOT=/path/to/data GOLD_JSONL=/path/to/data/dev.jsonl bash scripts/run_pipeline.sh
 ```
