@@ -4,7 +4,7 @@
 
 This is the submission repository for the [DCASE 2026 Task 5 Audio-Dependent Question Answering](https://dcase.community/challenge2026/task-audio-dependent-question-answering) challenge.
 
-🏆 Teams ranking: 4.
+🏆 Teams ranking: 4.<br>
 🥉 Lightweight system ranking: 3.
 
 ## Method
