@@ -1,6 +1,6 @@
 # ATAE: Audio Token Attention Enhancement
 
-**ATAE (Audio Token Attention Enhancement)** injects a tunable additive bias on audio key positions in the decoder self-attention of audio-language models, encouraging the model to attend more to audio tokens. This repository provides a full experimental pipeline built on [MOSS-Audio-8B-Thinking](https://huggingface.co/OpenMOSS/MOSS-Audio-8B-Thinking): inference, answer parsing/rematching, and accuracy evaluation.
+**ATAE (Audio Token Attention Enhancement)** injects a tunable additive bias on audio key positions in the decoder self-attention of audio-language models, encouraging the model to attend more to audio tokens. This repository provides a full experimental pipeline built on [OpenMOSS/MOSS-Audio](https://github.com/OpenMOSS/MOSS-Audio): inference, answer parsing/rematching, and accuracy evaluation.
 
 This is the submission repository for the [DCASE 2026 Task 5 Audio-Dependent Question Answering](https://dcase.community/challenge2026/task-audio-dependent-question-answering) challenge.
 
@@ -64,7 +64,7 @@ export MOSS_AUDIO_DIR=/path/to/MOSS-Audio
 
 **4. Download model weights**
 
-Download [MOSS-Audio-8B-Thinking](https://huggingface.co/OpenMOSS/MOSS-Audio-8B-Thinking) from Hugging Face:
+Download [MOSS-Audio-8B-Thinking](https://huggingface.co/OpenMOSS-Team/MOSS-Audio-8B-Thinking) from Hugging Face:
 
 ```bash
 export MODEL_PATH=/path/to/MOSS-Audio-8B-Thinking
